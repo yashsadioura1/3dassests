@@ -1,0 +1,55 @@
+//At first , we will create the contract interfaces.
+
+import Web3 from 'web3';
+
+// Connect to local Ethereum node
+const web3 = new Web3(Web3.givenProvider || 'http://localhost:8545');
+
+// Replace these with your deployed contract addresses
+const threeDAssetAddress = '0xYourThreeDAssetContractAddress';
+const marketplaceAddress = '0xYourMarketplaceContractAddress';
+
+// ABI of the contracts
+const threeDAssetABI = [/* Your ThreeDAsset ABI here */];
+const marketplaceABI = [/* Your Marketplace ABI here */];
+
+// Create contract instances
+const threeDAsset = new web3.eth.Contract(threeDAssetABI, threeDAssetAddress);
+const marketplace = new web3.eth.Contract(marketplaceABI, marketplaceAddress);
+
+export { web3, threeDAsset, marketplace };
+
+//And now the List 
+import React, { useState } from 'react';
+import { web3, marketplace } from '../contracts';
+
+const ListAsset = () => {
+  const [tokenId, setTokenId] = useState(0);
+  const [price, setPrice] = useState(0);
+
+  const listAsset = async () => {
+    const accounts = await web3.eth.getAccounts();
+    await marketplace.methods.listAsset(tokenId, price).send({ from: accounts[0] });
+  };
+
+  return (
+    <div>
+      <h2>List 3D Asset</h2>
+      <input
+        type="number"
+        placeholder="Token ID"
+        value={tokenId}
+        onChange={(e) => setTokenId(e.target.value)}
+      />
+      <input
+        type="number"
+        placeholder="Price in Wei"
+        value={price}
+        onChange={(e) => setPrice(e.target.value)}
+      />
+      <button onClick={listAsset}>List Asset</button>
+    </div>
+  );
+};
+
+export default ListAsset;
